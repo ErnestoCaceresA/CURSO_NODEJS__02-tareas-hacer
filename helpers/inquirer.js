@@ -14,31 +14,31 @@ const preguntas = [
         choices: [
             {
                 value: "1",
-                name: "1. Crear tarea"
+                name: `${"1".green}. Crear tarea`
             },
             {
                 value: "2",
-                name: "2. Listar tareas"
+                name: `${"2.".green} Listar tareas`
             },
             {
                 value: "3",
-                name: "3.Listar tareas completadas"
+                name: `${"3.".green} Listar tareas completadas`
             },
             {
                 value: "4",
-                name: "4. Listar tareas pendientes"
+                name: `${"4.".green} Listar tareas pendientes`
             },
             {
                 value: "5",
-                name: "5. Completar tarea(s)"
+                name: `${"5.".green} Completar tarea(s)`
             },
             {
                 value: "6",
-                name: "6. Borrar tarea"
+                name: `${"6.".green} Borrar tarea`
             },
             {
                 value: "0",
-                name: "0. Salir"
+                name: `${"0.".green} Salir`
             }
         ]
     }
@@ -48,7 +48,7 @@ const inquierMenu = async() => {
 
     console.clear();
     console.log("=====================".green);
-    console.log("SELECCIONE UNA OPCION".green);
+    console.log("SELECCIONE UNA OPCION".white);
     console.log("=====================\n".green);
 
     const {opcion:opt} = await inquirer.prompt(preguntas);
@@ -89,9 +89,80 @@ const leerInput = async( message ) =>{
     return desc;
 }
 
+const listadoTareasBorrar = async( tarea = [] ) =>{ //async para poder usar el await porque es una funcion asincrona porque SE ESPERA UNA RESPUESTA
+
+    const choices = tarea.map( (tarea, i) => {
+       
+        const idx = `${i + 1}`.green;
+        
+        return{
+            value: tarea.id,
+            name: `${ idx } ${tarea.desc}`
+        }
+    })
+
+    choices.unshift({ //PARA AGREGAR AL ULTIMO ES COMO UN .PUSH DE LOS ARREGLOS PERO ESTO ES DEL INQUIRER DOCUMENTACION
+        value: '0',
+        name: '0.'.green + ' Cancelar'
+    })
+
+    const preguntas = [
+        {
+            type: "list",
+            name: "id",
+            message: "Borrar",
+            choices
+        }
+    ]
+
+    const { id } = await inquirer.prompt(preguntas);
+    return id;
+}
+
+const confirmar = async(message) => { //async para poder usar el await porque es una funcion asincrona porque SE ESPERA UNA RESPUESTA
+
+    const question = [
+        {
+            type: 'confirm', //documentacion inquirer
+            name: 'ok',
+            message
+        }
+    ];
+
+    const { ok } = await inquirer.prompt(question);
+    return ok;
+}
+
+const mostrarListadoChecklist = async( tarea = [] ) =>{ //async para poder usar el await porque es una funcion asincrona porque SE ESPERA UNA RESPUESTA
+
+    const choices = tarea.map( (tarea, i) => {
+        const idx = `${i + 1}`.green;
+        return{
+            value: tarea.id,
+            name: `${ idx } ${tarea.desc}`,
+            checked: ( tarea.completadoEn ) ? true : false
+        }
+    })
+
+    const preguntas = [
+        {
+            type: "checkbox", //documentacion inquirer
+            name: "ids",
+            message: "Selecciones",
+            choices
+        }
+    ]
+
+    const { ids } = await inquirer.prompt(preguntas);
+    return ids;
+}
+
 
 module.exports = {
     inquierMenu,
     pausa,
-    leerInput
+    leerInput,
+    listadoTareasBorrar,
+    confirmar,
+    mostrarListadoChecklist
 }
